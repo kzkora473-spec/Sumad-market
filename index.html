@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
-        /* Убираем синее/голубое выделение при нажатии на смартфонах */
         * {
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
@@ -22,60 +21,64 @@
 
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding-bottom: 75px; color: #1f2026; }
         
-        /* Шапка сайта */
         header { background: #fff; padding: 12px 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eef0f3; }
         .header-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 10px; }
         .loc { font-weight: 500; display: flex; align-items: center; gap: 6px; }
-        .search-input { background: #f2f4f7; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
-        .search-input input { border: none; background: transparent; width: 100%; outline: none; font-size: 14px; color: #1f2026; }
+        .search-trigger { background: #f2f4f7; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .search-trigger span { font-size: 14px; color: #9a9eab; }
 
         .page { display: none; padding: 12px; }
         .page.active { display: block; }
 
-        /* Элемент загрузки (Loader) */
-        #loader {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #7f3ffc;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 10px auto;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Окно авторизации/регистрации */
+        .auth-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: #f4f5f7; z-index: 5000; display: flex; flex-direction: column; justify-content: center; padding: 24px; }
+        .auth-box { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #eef0f3; }
+        .auth-box h2 { margin-top: 0; font-size: 22px; color: #1f2026; text-align: center; margin-bottom: 20px; }
+        .auth-box input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid #e3e5ec; border-radius: 10px; outline: none; font-size: 15px; }
+        .auth-btn { width: 100%; background: #7f3ffc; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .auth-toggle { text-align: center; margin-top: 15px; font-size: 13px; color: #7f3ffc; cursor: pointer; font-weight: 500; }
 
-        /* Блок распродажи */
-        .promo-sale { background: linear-gradient(180deg, #107eff, #0056c6); color: white; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-        .promo-header { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        /* Отдельный экран поиска */
+        #search-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 3000; display: none; flex-direction: column; }
+        .search-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #eef0f3; }
+        .search-input-wrapper { flex: 1; background: #f2f4f7; border-radius: 10px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
+        .search-input-wrapper input { border: none; background: transparent; width: 100%; outline: none; font-size: 15px; }
+        .search-content { padding: 16px; overflow-y: auto; flex: 1; }
+        .search-section-title { font-size: 14px; font-weight: bold; color: #8b8e99; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .history-list, .recom-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 25px; }
+        .search-item { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #1f2026; cursor: pointer; }
+        .search-item i { color: #b2b5c1; }
 
+        /* Экран детального просмотра товара */
+        #product-detail-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f4f5f7; z-index: 3500; display: none; flex-direction: column; overflow-y: auto; padding-bottom: 30px; }
+        .detail-header { background: white; padding: 14px 16px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #eef0f3; position: sticky; top: 0; z-index: 10; }
+        .detail-container { padding: 12px; }
+        .detail-main { background: white; border-radius: 16px; padding: 16px; border: 1px solid #eef0f3; margin-bottom: 12px; }
+        .detail-img-box { background: #f5f6f9; width: 100%; aspect-ratio: 1.2; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 70px; color: #b2b5c1; margin-bottom: 15px; }
+        .detail-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+        .detail-seller { font-size: 13px; color: #7f3ffc; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 4px; }
+        
         /* Сетка товаров */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .card { background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #eef0f3; position: relative; cursor: pointer; }
-        .card-img { background: #f5f6f9; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #b2b5c1; }
+        .card { background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #eef0f3; position: relative; }
+        .card-img { background: #f5f6f9; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #b2b5c1; cursor: pointer; }
         .card-body { padding: 8px 10px; display: flex; flex-direction: column; flex-grow: 1; }
-        .card-title { font-size: 13px; line-height: 1.3; height: 34px; overflow: hidden; margin-bottom: 4px; color: #212121; }
+        .card-title { font-size: 13px; line-height: 1.3; height: 34px; overflow: hidden; margin-bottom: 4px; color: #212121; cursor: pointer; }
+        .card-seller { font-size: 11px; color: #8b8e99; margin-bottom: 6px; font-weight: 500; }
         .card-badge { background: #fff066; color: #1f2026; font-size: 11px; padding: 2px 6px; border-radius: 4px; width: max-content; margin-bottom: 6px; font-weight: 500; }
         .card-price-row { margin-top: auto; }
         .card-price { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
-        .uzum-icon { background: #7f3ffc; color: white; font-size: 9px; padding: 1px 3px; border-radius: 3px; font-weight: bold; text-transform: uppercase; }
+        .uzum-icon { background: #7f3ffc; color: white; font-size: 9px; padding: 1px 3px; border-radius: 3px; font-weight: bold; }
 
-        /* Кнопки */
         .card-actions { display: flex; gap: 4px; margin-top: 8px; }
         .btn-action { flex: 1; border: none; padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
         .btn-buy { background: #7f3ffc; color: white; }
+        .btn-report { background: #fee2e2; color: #dc2626; }
+
+        /* Элемент загрузки (Loader) */
+        #loader { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4000; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #7f3ffc; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Корзина */
         .cart-box { background: white; border-radius: 16px; padding: 16px; border: 1px solid #eef0f3; }
@@ -94,7 +97,6 @@
         .pin-screen { background: white; border-radius: 16px; padding: 30px 20px; text-align: center; border: 1px solid #eef0f3; }
         .pin-input { width: 150px; text-align: center; font-size: 22px; letter-spacing: 4px; padding: 10px; border: 2px solid #7f3ffc; border-radius: 8px; outline: none; margin-bottom: 15px; }
 
-        /* Конвертация валют */
         .crypto-box { background: white; border-radius: 16px; padding: 16px; margin-top: 15px; border: 1px solid #eef0f3; }
         .crypto-box select, .crypto-box input { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #e3e5ec; border-radius: 8px; box-sizing: border-box; outline: none; }
         .btn-exchange { width: 100%; background: #7f3ffc; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
@@ -108,6 +110,82 @@
 </head>
 <body>
 
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-box">
+            <h2 id="auth-title">Регистрация в Sumad Market</h2>
+            <input type="text" id="auth-name" placeholder="Имя">
+            <input type="text" id="auth-surname" placeholder="Фамилия">
+            <input type="password" id="auth-pass" placeholder="Пароль">
+            <button class="auth-btn" onclick="submitAuth()">Продолжить</button>
+            <div class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Вы не первый раз? Введите свой аккаунт</div>
+        </div>
+    </div>
+
+    <div id="search-screen">
+        <div class="search-header">
+            <i class="bi bi-arrow-left" style="font-size: 20px; cursor: pointer;" onclick="closeSearch()"></i>
+            <div class="search-input-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="search-main-field" placeholder="Искать на Sumad Market">
+            </div>
+        </div>
+        <div class="search-content">
+            <div class="search-section-title">Прошлые поиски</div>
+            <div class="history-list">
+                <div class="search-item" onclick="selectSearchQuery('Карандаш')"><i class="bi bi-clock-history"></i><span>Карандаш</span></div>
+                <div class="search-item" onclick="selectSearchQuery('Чёрный карандаш')"><i class="bi bi-clock-history"></i><span>Чёрный карандаш</span></div>
+                <div class="search-item" onclick="selectSearchQuery('Разноцветные карандаши')"><i class="bi bi-clock-history"></i><span>Разноцветные карандаши</span></div>
+            </div>
+
+            <div class="search-section-title">Рекомендации</div>
+            <div class="recom-list">
+                <div class="search-item" onclick="selectSearchQuery('Наушники')"><i class="bi bi-graph-up-arrow"></i><span>Наушники беспроводные</span></div>
+                <div class="search-item" onclick="selectSearchQuery('Чехол')"><i class="bi bi-graph-up-arrow"></i><span>Чехол на телефон</span></div>
+                <div class="search-item" onclick="selectSearchQuery('Блокнот')"><i class="bi bi-graph-up-arrow"></i><span>Блокнот для рисования</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="product-detail-screen">
+        <div class="detail-header">
+            <i class="bi bi-arrow-left" style="font-size: 22px; cursor: pointer;" onclick="closeProductDetail()"></i>
+            <b style="font-size: 16px;">Описание товара</b>
+        </div>
+        <div class="detail-container">
+            <div class="detail-main">
+                <div class="detail-img-box" id="det-img"><i class="bi bi-box-seam"></i></div>
+                <div class="detail-title" id="det-title">Название товара</div>
+                <div class="detail-seller"><i class="bi bi-shop"></i> Продавец: <span id="det-seller-name">Название сети</span></div>
+                <div style="font-size: 22px; font-weight: bold; color: #7f3ffc; margin-bottom: 15px;" id="det-price">0 сум</div>
+                
+                <h4 style="margin-bottom: 6px;">Характеристики:</h4>
+                <div style="font-size: 14px; color: #4d4f59; line-height: 1.5; margin-bottom: 15px; white-space: pre-line;" id="det-specs">Нет характеристик</div>
+
+                <h4 style="margin-bottom: 6px;">Описание:</h4>
+                <div style="font-size: 14px; color: #4d4f59; line-height: 1.5;" id="det-desc">Нет описания</div>
+            </div>
+
+            <div class="form-panel">
+                <h4 style="margin-top:0; margin-bottom:10px;"><i class="bi bi-star-half" style="color:#f5c443;"></i> Отзывы и оценки</h4>
+                <div id="detail-reviews-list" style="margin-bottom:15px; display:flex; flex-direction:column; gap:10px;"></div>
+                
+                <label style="font-size:12px; color:#8b8e99;">Поставить оценку:</label>
+                <select id="review-rating-select">
+                    <option value="5">5.0 ★★★★★</option>
+                    <option value="4.5">4.5 ★★★★☆</option>
+                    <option value="4">4.0 ★★★★</option>
+                    <option value="3.5">3.5 ★★★☆</option>
+                    <option value="3">3.0 ★★★</option>
+                    <option value="2">2.0 ★★</option>
+                    <option value="1">1.0 ★</option>
+                    <option value="0.5">0.5 ☆</option>
+                </select>
+                <textarea id="review-text-input" rows="2" placeholder="Напишите честный отзыв..."></textarea>
+                <button onclick="addReview()" style="width:100%; background:#7f3ffc; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">Оставить отзыв</button>
+            </div>
+        </div>
+    </div>
+
     <div id="loader">
         <div class="spinner"></div>
         <div style="font-size:13px; color:#7f3ffc; font-weight:bold;">Загрузка...</div>
@@ -118,9 +196,9 @@
             <div class="loc"><i class="bi bi-geo-alt-fill" style="color: #7f3ffc;"></i> <span id="txt-city">Кунград</span></div>
             <div style="color: #8b8e99;" id="txt-city-sub">город доставки</div>
         </div>
-        <div class="search-input">
+        <div class="search-trigger" onclick="openSearch()">
             <i class="bi bi-search"></i>
-            <input type="text" id="txt-search-placeholder" placeholder="Искать товары на Sumad Market">
+            <span id="txt-search-placeholder">Искать товары на Sumad Market</span>
         </div>
     </header>
 
@@ -130,20 +208,9 @@
             <div style="font-size: 11px; opacity: 0.9;" id="txt-promo-desc">все выгодные предложения недели в одной подборке</div>
         </div>
 
-        <div class="grid" id="products-list">
-            <div class="card">
-                <div class="card-img"><i class="bi bi-phone"></i></div>
-                <div class="card-body">
-                    <div class="card-badge">150,000 сум/мес</div>
-                    <div class="card-title">Смартфон Sumad Pro X</div>
-                    <div class="card-price-row">
-                        <div class="card-price">1,800,000 сум <span class="uzum-icon">sumad</span></div>
-                    </div>
-                    <div class="card-actions">
-                        <button type="button" class="btn-action btn-buy" onclick="event.stopPropagation(); buyItem('Смартфон Sumad Pro X', 1800000)">В корзину</button>
-                    </div>
-                </div>
-            </div>
+        <div class="grid" id="products-list"></div>
+        <div id="empty-catalog-msg" style="text-align:center; color:#8b8e99; padding:40px 10px; font-size:14px;">
+            В каталоге пока нет активных товаров. Станьте первым продавцом в профиле!
         </div>
     </div>
 
@@ -214,87 +281,4 @@
         <div class="profile-header">
             <div class="avatar"><i class="bi bi-person"></i></div>
             <div>
-                <div style="font-size: 18px; font-weight: bold;">Махсетов Ерасыл</div>
-                <div style="font-size: 13px; opacity: 0.8;">+998 91 259 11 15</div>
-            </div>
-        </div>
-
-        <div style="padding: 12px;">
-            <div style="background:#fff; padding:12px; border-radius:12px; border:1px solid #eef0f3; font-size:14px; margin-bottom:10px; text-align:center;">
-                <span id="txt-bought-count">Оформлено товаров:</span> <b id="orders-count-badge" style="color:#7f3ffc;">0</b> / 5
-            </div>
-
-            <button id="btn-become-seller" onclick="showSellerForm()" style="display:none; width:100%; background:#7f3ffc; color:white; border:none; padding:14px; border-radius:12px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
-                Стать продавцом (Регистрация)
-            </button>
-
-            <div id="seller-register-form" class="form-panel" style="display:none;">
-                <h4 style="margin-top:0;" id="txt-biz-reg-title">Регистрация продавца</h4>
-                
-                <label style="font-size:12px; color:#8b8e99; display:block; margin-bottom:4px;">Выберите язык системы:</label>
-                <select id="lang-select" onchange="changeLanguage(this.value)" style="margin-bottom: 12px;">
-                    <option value="ru">Русский</option>
-                    <option value="kk">Қазақша</option>
-                    <option value="uz_cyr">Ўзбекча (Кирилл)</option>
-                    <option value="uz_lat">O'zbekcha (Lotin)</option>
-                    <option value="kaa_cyr">Қарақалпақша (Кирилл)</option>
-                    <option value="kaa_lat">Qaraqalpaqsha (Lotin)</option>
-                    <option value="ko">한국어 (하응굴)</option>
-                </select>
-
-                <input type="text" id="biz-user-name" placeholder="Ваше имя">
-                <input type="text" id="biz-name" placeholder="Название бизнеса">
-                <input type="text" id="biz-address" placeholder="Адрес (не желательно)">
-                <button type="button" onclick="submitSellerReg()" style="width:100%; background:#10b981; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;" id="txt-btn-save-biz">Создать компанию</button>
-            </div>
-
-            <div id="panel-add-product" class="form-panel" style="display:none;">
-                <b style="display:block; margin-bottom:10px; color:#10b981;"><i class="bi bi-shop"></i> <span id="txt-add-panel-title">Управление магазином</span></b>
-                <input type="text" id="add-name" placeholder="Название товара">
-                <input type="number" id="add-price" placeholder="Цена в сумах">
-                <input type="number" id="add-payment" placeholder="Платёж в месяц">
-                <input type="text" id="add-brand" placeholder="Бренд">
-                <textarea id="add-desc" rows="3" placeholder="Описание товара..."></textarea>
-                <button type="button" onclick="createProduct()" style="width:100%; background:#10b981; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;" id="txt-btn-publish">Выставить на Sumad</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="nav">
-        <button class="nav-btn active" id="btn-tab-home" onclick="tab('home')"><i class="nav-icon bi bi-house-door"></i><span id="tab-lbl-home">Главная</span></button>
-        <button class="nav-btn" id="btn-tab-cart" onclick="tab('cart')"><i class="nav-icon bi bi-cart3"></i><span id="tab-lbl-cart">Корзина</span></button>
-        <button class="nav-btn" id="btn-tab-card" onclick="tab('card')"><i class="nav-icon bi bi-credit-card"></i><span id="tab-lbl-card">Карта</span></button>
-        <button class="nav-btn" id="btn-tab-chat" onclick="tab('chat')"><i class="nav-icon bi bi-chat-left-text"></i><span id="tab-lbl-chat">Общение</span></button>
-        <button class="nav-btn" id="btn-tab-profile" onclick="tab('profile')"><i class="nav-icon bi bi-person-circle"></i><span id="tab-lbl-profile">Профиль</span></button>
-    </div>
-
-    <script>
-        let cart = [];
-        let totalOrdersSent = 0;
-        let isSellerApproved = false;
-
-        // Языковая база данных сайта
-        const languages = {
-            ru: {
-                city: "Кунград", cityS: "город доставки", search: "Искать товары на Sumad Market", promoT: "Летняя распродажа", promoD: "все выгодные предложения недели в одной подборке",
-                cartT: "Ваш заказ", cartE: "В корзине пока пусто", totalL: "Итого к оплате:", checkout: "Оформить",
-                pinT: "Введите Пин-код карты", pinH: "(Введите один из секретных паролей компании)", unlock: "Войти в банк", balL: "Доступный остаток",
-                exT: "Обмен и перевод валюты", convert: "Конвертировать", chatW: "Приветствуем! Тут можно обсудить любой товар.",
-                boughtC: "Оформлено товаров:", bizRegT: "Регистрация продавца", saveBiz: "Создать компанию", shopT: "Управление магазином",
-                publish: "Выставить на Sumad", mH: "Главная", mC: "Корзина", mK: "Карта", mCh: "Общение", mP: "Профиль"
-            },
-            kk: {
-                city: "Қоңырат", cityS: "жеткізу қаласы", search: "Sumad Market-тен тауарларды іздеу", promoT: "Жазғы жеңілдіктер", promoD: "аптаның барлық тиімді ұсыныстары бір жерде",
-                cartT: "Сіздің тапсырысыңыз", cartE: "Себет әзірге бос", totalL: "Төлеуге барлығы:", checkout: "Тапсырыс беру",
-                pinT: "Картаның ПИН-кодын енгізіңіз", pinH: "(Компанияның құпия паролін енгізіңіз)", unlock: "Банкке кіру", balL: "Қолжетімді қалдық",
-                exT: "Валюта айырбастау және аудару", convert: "Айырбастау", chatW: "Қош келдіңіз! Мұнда кез келген тауарды талқылауға болады.",
-                boughtC: "Рәсімделген тауарлар:", bizRegT: "Сатушыны тіркеу", saveBiz: "Компанияны құру", shopT: "Дүкенді басқару",
-                publish: "Sumad-қа шығару", mH: "Басты бет", mC: "Себет", mK: "Карта", mCh: "Чат", mP: "Профиль"
-            },
-            uz_cyr: {
-                city: "Қўнғирот", cityS: "етказиб бериш шаҳри", search: "Sumad Market дан маҳсулот излаш", promoT: "Ёзги чегирмалар", promoD: "ҳафтанинг барча фойдали таклифлари бир жойда",
-                cartT: "Буюртмангиз", cartE: "Саватча ҳали бўш", totalL: "Тўлов учун жами:", checkout: "Расмийлаштириш",
-                pinT: "Карта ПИН-кодини киритинг", pinH: "(Компания махфий паролини киритинг)", unlock: "Банкка кириш", balL: "Мавжуд қолдиқ",
-                exT: "Валюта айирбошлаш ва ўтказиш", convert: "Конвертация", chatW: "Хуш келибсиз! Бу ерда маҳсулотларни муҳокама қилиш мумкин.",
-                boughtC: "Харид қилинган маҳсулотлар:", bizRegT: "Сотувчини рўйхатдан ўтказиш", saveBiz: "Корхона яратиш", shopT: "Дўкон бошқаруви",
-                publish: "Sumad га жойлаштириш", mH: "Асосий", mC: "Саватча", mK: "Карта
+                <div style="font-size: 18px; font-weight: bold;" id="profile-display-name">Пользователь</
