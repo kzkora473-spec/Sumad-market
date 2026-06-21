@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sumad Market</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding-bottom: 75px; color: #1f2026; }
+        
+        /* Шапка сайта */
+        header { background: #fff; padding: 12px 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eef0f3; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 10px; }
+        .loc { font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .search-input { background: #f2f4f7; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+        .search-input input { border: none; background: transparent; width: 100%; outline: none; font-size: 14px; color: #1f2026; }
+
+        .page { display: none; padding: 12px; }
+        .page.active { display: block; }
+
+        /* Синий блок распродажи */
+        .promo-sale { background: linear-gradient(180deg, #107eff, #0056c6); color: white; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .promo-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+        .timer { display: flex; gap: 4px; }
+        .timer-unit { background: white; color: #0056c6; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; min-width: 18px; text-align: center; }
+
+        /* Сетка товаров */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #eef0f3; position: relative; cursor: pointer; }
+        .card-img { background: #f5f6f9; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #b2b5c1; }
+        .card-body { padding: 8px 10px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-title { font-size: 13px; line-height: 1.3; height: 34px; overflow: hidden; margin-bottom: 4px; color: #212121; }
+        .card-badge { background: #fff066; color: #1f2026; font-size: 11px; padding: 2px 6px; border-radius: 4px; width: max-content; margin-bottom: 6px; font-weight: 500; }
+        .card-price-row { margin-top: auto; }
+        .card-price { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .uzum-icon { background: #7f3ffc; color: white; font-size: 9px; padding: 1px 3px; border-radius: 3px; font-weight: bold; text-transform: uppercase; }
+
+        /* Кнопки действий */
+        .card-actions { display: flex; gap: 4px; margin-top: 8px; }
+        .btn-action { flex: 1; border: none; padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; }
+        .btn-buy { background: #7f3ffc; color: white; }
+
+        /* Корзина */
+        .cart-box { background: white; border-radius: 16px; padding: 16px; border: 1px solid #eef0f3; }
+        .cart-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .order-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: #4d4f59; }
+        .order-total { font-size: 18px; font-weight: bold; color: #1f2026; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f4f7; }
+        .btn-order { background: #7f3ffc; color: white; width: 100%; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: bold; margin-top: 15px; }
+
+        /* Профиль */
+        .profile-header { background: linear-gradient(135deg, #8f46ff, #6211c8); color: white; padding: 30px 16px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; display: flex; align-items: center; gap: 16px; }
+        .avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .form-add { padding: 16px; background: white; border-radius: 16px; margin-top: 12px; border: 1px solid #eef0f3; }
+        .form-add input, .form-add textarea { width: 100%; padding: 12px; margin-bottom: 8px; border: 1px solid #e3e5ec; border-radius: 8px; box-sizing: border-box; outline: none; font-family: inherit; }
+        
+        /* Конвертация валют */
+        .crypto-box { background: white; border-radius: 16px; padding: 16px; margin-top: 15px; border: 1px solid #eef0f3; }
+        .crypto-box select, .crypto-box input { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #e3e5ec; border-radius: 8px; box-sizing: border-box; outline: none; }
+        .btn-exchange { width: 100%; background: #7f3ffc; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+
+        /* Модальное окно */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-sizing: border-box; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-close { float: right; font-size: 24px; cursor: pointer; color: #9a9eab; }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; padding-right: 20px; }
+        .modal-price { font-size: 22px; font-weight: bold; color: #7f3ffc; margin-bottom: 15px; }
+        .detail-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #eef0f3; padding: 8px 0; font-size: 14px; }
+        .detail-label { color: #8b8e99; }
+
+        /* Нижнее меню */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 60px; display: flex; border-top: 1px solid #eef0f3; z-index: 1000; }
+        .nav-btn { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #9a9eab; font-weight: 500; gap: 4px; cursor: pointer; }
+        .nav-btn.active { color: #7f3ffc; }
+        .nav-icon { font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="loc"><i class="bi bi-geo-alt-fill" style="color: #7f3ffc;"></i> Кунград</div>
+            <div style="color: #8b8e99;">город доставки</div>
+        </div>
+        <div class="search-input">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Искать товары на Sumad Market">
+        </div>
+    </header>
+
+    <div id="p-home" class="page active">
+        <div class="promo-sale">
+            <div class="promo-header">
+                <span>Летняя распродажа <i class="bi bi-chevron-right"></i></span>
+                <div class="timer">
+                    <div class="timer-unit" id="t-hr">02</div>:
+                    <div class="timer-unit" id="t-min">45</div>:
+                    <div class="timer-unit" id="t-sec">59</div>
+                </div>
+            </div>
+            <div style="font-size: 11px; opacity: 0.9;">все выгодные предложения недели в одной подборке</div>
+        </div>
+
+        <div class="grid" id="products-list">
+            <div style="grid-column: 1/-1; text-align: center; color: #8b8e99; padding: 40px 0;" id="empty-feed">
+                <i class="bi bi-shop" style="font-size: 40px;"></i><br><br>Витрина пуста. Перейдите в Профиль, чтобы выставить первый товар!
+            </div>
+        </div>
+    </div>
+
+    <div id="p-cart" class="page">
+        <div class="cart-box">
+            <div class="cart-title">Ваш заказ</div>
+            <div id="cart-items">
+                <div style="color:#8b8e99; text-align:center; padding:20px;"><i class="bi bi-cart-x" style="font-size: 30px;"></i><br>В корзине пока пусто</div>
+            </div>
+            <div class="order-total">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Итого к оплате:</span>
+                    <span id="total-sum" style="color:#7f3ffc;">0 сум</span>
+                </div>
+            </div>
+            <button class="btn-order">Оформить</button>
+        </div>
+    </div>
+
+    <div id="p-card" class="page">
+        <div style="background: linear-gradient(135deg, #7f3ffc, #591bda); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(127,63,252,0.3);">
+            <div style="font-size: 18px; font-weight: bold;">КлассГрамм Банк</div>
+            <div style="width: 40px; height: 30px; background: #f5c443; border-radius: 6px; margin: 25px 0 10px 0; display: flex; align-items: center; justify-content: center; color: #333;"><i class="bi bi-cpu"></i></div>
+            <div style="font-size: 11px; opacity: 0.8;">Доступный остаток</div>
+            <div style="font-size: 26px; font-weight: bold; margin-bottom: 5px;">0 UZS</div>
+            <div style="font-size: 12px; font-family: monospace; opacity: 0.8; letter-spacing: 2px;">•••• •••• •••• 7777</div>
+        </div>
+
+        <div class="crypto-box">
+            <b style="font-size: 14px; color: #1f2026;"><i class="bi bi-cash-coin" style="color: #7f3ffc;"></i> Обмен и перевод валюты</b>
+            <div style="margin-top: 10px;">
+                <label style="font-size: 12px; color: #8b8e99;">Выберите валюту получения:</label>
+                <select id="currency-select">
+                    <option value="UZS">UZS (Узбекский сум)</option>
+                    <option value="KZT">KZT (Казахстанский тенге ₸)</option>
+                    <option value="KRW">KRW (Южнокорейская вона ₩)</option>
+                    <option value="CNY">CNY (Китайский юань ¥)</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px;">
+                <label style="font-size: 12px; color: #8b8e99;">Сумма перевода:</label>
+                <input type="number" id="exchange-amount" placeholder="Введите сумму">
+            </div>
+            <button class="btn-exchange" onclick="exchangeCurrency()">Конвертировать</button>
+            <div id="exchange-result" style="margin-top: 12px; font-size: 14px; font-weight: bold; color: #10b981; text-align: center;"></div>
+        </div>
+    </div>
+
+    <div id="p-chat" class="page">
+        <div class="chat-area" id="chat-messages" style="max-height: 300px; overflow-y: auto; padding: 10px; background: white; border-radius: 12px; border: 1px solid #eef0f3;">
+            <div style="background: #f2f4f7; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; max-width: 80%;">Приветствуем в Sumad Market! Тут можно обсудить любой товар.</div>
+        </div>
+        <div style="display: flex; gap: 6px; margin-top: 10px;">
+            <input type="text" id="chat-inp" placeholder="Сообщение..." style="flex:1; padding:12px; border:1px solid #e3e5ec; border-radius:10px; outline:none;">
+            <button onclick="sendMsg()" style="background:#7f3ffc; color:white; border:none; padding: 0 16px; border-radius:10px; font-weight:bold;"><i class="bi bi-send"></i></button>
+        </div>
+    </div>
+
+    <div id="p-profile" class="page" style="padding:0;">
+        <div class="profile-header">
+            <div class="avatar"><i class="bi bi-person"></i></div>
+            <div>
+                <div style="font-size: 18px; font-weight: bold;">Махсетов Ерасыл</div>
+                <div style="font-size: 13px; opacity: 0.8;">+998 91 259 11 15</div>
+            </div>
+        </div>
+
+        <div class="form-add">
+            <b style="display:block; margin-bottom:10px;"><i class="bi bi-plus-circle-fill" style="color: #10b981;"></i> Добавить новый товар</b>
+            <input type="text" id="add-name" placeholder="Название товара">
+            <input type="number" id="add-price" placeholder="Цена в сумах">
+            <input type="number" id="add-payment" placeholder="Платёж в месяц (сум/мес)">
+            <input type="text" id="add-brand" placeholder="Производитель / Бренд">
+            <textarea id="add-desc" rows="3" placeholder="Описание товара и его главные характеристики..."></textarea>
+            <button type="button" onclick="createProduct()" style="width:100%; background:#10b981; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">Выставить на Sumad</button>
+        </div>
+    </div>
+
+    <div id="product-modal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="document.getElementById('product-modal').style.display='none'">&times;</span>
+            <div class="modal-title" id="m-title">Название товара</div>
+            <div class="modal-price" id="m-price">0 сум</div>
+            
+            <b style="display:block; margin-bottom:8px;">Характеристики:</b>
+            <div class="detail-row"><span class="detail-label">Бренд</span><span id="m-brand">-</span></div>
+            <div class="detail-row"><span class="detail-label">Рассрочка</span><span id="m-pay">-</span></div>
+            <div class="detail-row"><span class="detail-label">Доставка</span><span>В течение 1 дня (Бесплатно от Sumad)</span></div>
+            
+            <b style="display:block; margin-top:15px; margin-bottom:6px;">Описание товара:</b>
+            <p id="m-desc" style="font-size: 14px; color: #4d4f59; line-height: 1.5; margin: 0;"></p>
+            
+            <button id="m-buy-btn" style="width:100%; background:#7f3ffc; color:white; border:none; padding:14px; border-radius:12px; font-size:15px; font-weight:bold; margin-top:20px; cursor:pointer;">Добавить в корзину</button>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn active" id="btn-tab-home" onclick="tab('home')"><i class="nav-icon bi bi-house-door"></i><span>Главная</span></button>
+        <button class="nav-btn" id="btn-tab-cart" onclick="tab('cart')"><i class="nav-icon bi bi-cart3"></i><span>Корзина</span></button>
+        <button class="nav-btn" id="btn-tab-card" onclick="tab('card')"><i class="nav-icon bi bi-credit-card"></i><span>Карта</span></button>
+        <button class="nav-btn" id="btn-tab-chat" onclick="tab('chat')"><i class="nav-icon bi bi-chat-left-text"></i><span>Общение</span></button>
+        <button class="nav-btn" id="btn-tab-profile" onclick="tab('profile')"><i class="nav-icon bi bi-person-circle"></i><span>Профиль</span></button>
+    </div>
+
+    <script>
+        let cart = [];
+        let products = [];
+
+        let totalSeconds = 2 * 3600 + 45 * 60 + 59; 
+        setInterval(() => {
+            if (totalSeconds <= 0) totalSeconds = 24 * 3600;
+            totalSeconds--;
+            let hrs = Math.floor(totalSeconds / 3600);
+            let mins = Math.floor((totalSeconds % 3600) / 60);
+            let secs = totalSeconds % 60;
+            document.getElementById('t-hr').innerText = hrs < 10 ? '0' + hrs : hrs;
+            document.getElementById('t-min').innerText = mins < 10 ? '0' + mins : mins;
+            document.getElementById('t-sec').innerText = secs < 10 ? '0' + secs : secs;
+        }, 1000);
+
+        function tab(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('p-' + id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-tab-' + id).classList.add('active');
+        }
+
+        function createProduct() {
+            let name = document.getElementById('add-name').value;
+            let price = parseFloat(document.getElementById('add-price').value);
+            let pay = document.getElementById('add-payment').value || "0";
+            let brand = document.getElementById('add-brand').value || "Sumad Селлер";
+            let desc = document.getElementById('add-desc').value || "Описание отсутствует.";
+
+            if (!name || !price) return;
+
+            let pId = 'prod_' + Date.now();
+            let newProduct = { id: pId, name, price, pay, brand, desc };
+            products.push(newProduct);
+
+            document.getElementById('empty-feed').style.display = 'none';
+
+            let list = document.getElementById('products-list');
+            list.innerHTML += `
+                <div class="card" onclick="openProductDetails('${pId}')">
+                    <div class="card-img"><i class="bi bi-box-seam"></i></div>
+                    <div class="card-body">
+                        <div class="card-badge">${parseInt(pay).toLocaleString()} сум/мес</div>
+                        <div class="card-title">${name}</div>
+                        <div class="card-price-row">
+                            <div class="card-price">${parseInt(price).toLocaleString()} сум <span class="uzum-icon">sumad</span></div>
+                        </div>
+                        <div class="card-actions">
+                            <button type="button" class="btn-action btn-buy" onclick="event.stopPropagation(); buyItem('${name}', ${price})">В корзину</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-price').value = '';
+            document.getElementById('add-payment').value = '';
+            document.getElementById('add-brand').value = '';
+            document.getElementById('add-desc').value = '';
+
+            tab('home');
+        }
+
+        function openProductDetails(id) {
+            let p = products.find(item => item.id === id);
+            if(!p) return;
+            document.getElementById('m-title').innerText = p.name;
+            document.getElementById('m-price').innerText = parseInt(p.price).toLocaleString() + " сум";
+            document.getElementById('m-brand').innerText = p.brand;
+            document.getElementById('m-pay').innerText = parseInt(p.pay).toLocaleString() + " сум/мес";
+            document.getElementById('m-desc').innerText = p.desc;
+            document.getElementById('m-buy-btn').onclick = function() {
+                buyItem(p.name, p.price);
+                document.getElementById('product-modal').style.display = 'none';
+            };
+            document.getElementById('product-modal').style.display = 'flex';
+        }
+
+        function closeModal(e) {
+            if(e.target === document.getElementById('product-modal')) {
+                document.getElementById('product-modal').style.display = 'none';
+            }
+        }
+
+        function buyItem(name, price) {
+            cart.push({name, price});
+            let container = document.getElementById('cart-items');
+            container.innerHTML = "";
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                container.innerHTML += `<div class="order-row"><span><i class="bi bi-check-circle" style="color: #7f3ffc;"></i> ${item.name}</span><b>${item.price.toLocaleString()} сум</b></div>`;
+            });
+            document.getElementById('total-sum').innerText = total.toLocaleString() + " сум";
+            
+            let cartBtn = document.getElementById('btn-tab-cart');
+            cartBtn.style.transform = 'scale(1.2)';
+            setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+        }
+
+        function exchangeCurrency() {
+            let amount = parseFloat(document.getElementById('exchange-amount').value);
+      
